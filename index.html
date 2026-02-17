@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenyu Resources | Life Player Tools</title>
+    <style>
+        :root { --primary: #00ff41; --bg: #0b0b0b; --card: #161616; --text: #ffffff; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .header { text-align: center; margin-top: 40px; margin-bottom: 40px; }
+        .header h1 { font-size: 2rem; color: var(--primary); letter-spacing: 2px; text-transform: uppercase; margin: 0; }
+        .header p { color: #888; margin-top: 10px; font-size: 0.9rem; }
+        
+        /* 工具网格布局 */
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; width: 100%; max-width: 600px; }
+        
+        .tool-card { background: var(--card); border: 1px solid #333; border-radius: 15px; padding: 20px; text-align: center; text-decoration: none; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .tool-card:hover { border-color: var(--primary); transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0, 255, 65, 0.1); }
+        .tool-icon { font-size: 2rem; }
+        .tool-name { color: var(--text); font-weight: bold; font-size: 1rem; }
+        .tool-status { font-size: 0.7rem; color: var(--primary); background: rgba(0, 255, 65, 0.1); padding: 2px 8px; border-radius: 10px; }
+        
+        .coming-soon { opacity: 0.5; cursor: not-allowed; }
+        .coming-soon:hover { transform: none; border-color: #333; }
+
+        .footer { margin-top: 60px; color: #444; font-size: 0.8rem; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Zenyu Resources</h1>
+        <p>Senyu | The Life Player 9169 <br> 你的 30 天通关作弊工具箱</p>
+    </div>
+
+    <div class="tools-grid">
+        <a href="compound-calc.html" class="tool-card">
+            <span class="tool-icon">📈</span>
+            <span class="tool-name">复利计算器</span>
+            <span class="tool-status">ONLINE</span>
+        </a>
+
+        <div class="tool-card coming-soon">
+            <span class="tool-icon">🏠</span>
+            <span class="tool-name">房贷节省器</span>
+            <span class="tool-status" style="color: #888; background: #222;">LOCKED</span>
+        </div>
+
+        <div class="tool-card coming-soon">
+            <span class="tool-icon">🔥</span>
+            <span class="tool-name">FIRE 进度条</span>
+            <span class="tool-status" style="color: #888; background: #222;">LOCKED</span>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2026 Zenyu Resources. All Rights Reserved. <br>
+        "Don't tell your plan, speak with result."
+    </div>
+
+</body>
+</html>
