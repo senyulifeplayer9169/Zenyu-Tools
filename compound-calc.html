@@ -3,31 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game of Life | 复利计算器</title>
+    <title>Game of Life | Money Mission</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #00ff41; --bg: #0d0d0d; --card: #1a1a1a; --text: #e0e0e0; }
-        body { background: var(--bg); color: var(--text); font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding-top: 20px; }
+        body { background: var(--bg); color: var(--text); font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px 0; }
         .back-link { color: #888; text-decoration: none; font-size: 0.9rem; margin-bottom: 20px; font-family: 'Segoe UI', sans-serif;}
         .back-link:hover { color: var(--primary); }
-        .container { background: var(--card); padding: 2rem; border-radius: 15px; border: 2px solid var(--primary); box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); width: 90%; max-width: 400px; }
-        h1 { color: var(--primary); text-align: center; font-size: 1.5rem; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 0;}
+        .container { background: var(--card); padding: 2rem; border-radius: 15px; border: 2px solid var(--primary); box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); width: 90%; max-width: 500px; }
+        
+        /* 标题样式升级 */
+        h1 { color: var(--primary); text-align: center; font-size: 1.5rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; margin-top: 0;}
+        .subtitle { text-align: center; color: #888; font-size: 0.9rem; margin-bottom: 1.5rem; font-family: 'Segoe UI', sans-serif;}
+        
         .input-group { margin-bottom: 1rem; }
         label { display: block; margin-bottom: 0.5rem; font-size: 0.8rem; color: #888; }
         input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: var(--primary); border-radius: 5px; box-sizing: border-box; font-size: 1rem; outline: none; }
         input:focus { border-color: var(--primary); }
+        
+        /* 结果框 */
         .result-box { margin-top: 2rem; padding: 1rem; background: #000; border-radius: 10px; border-left: 4px solid var(--primary); }
         .result-label { font-size: 0.8rem; color: #888; }
-        .result-value { font-size: 1.8rem; color: var(--primary); font-weight: bold; margin-top: 5px; }
-        .footer { text-align: center; margin-top: 1.5rem; font-size: 0.7rem; color: #555; }
+        .result-value { font-size: 2rem; color: var(--primary); font-weight: bold; margin-top: 5px; text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);}
+        
+        /* 本金与利息明细 */
+        .breakdown { display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #333; }
+        .breakdown div { width: 48%; background: #111; padding: 10px; border-radius: 8px; text-align: center; font-family: 'Segoe UI', sans-serif; }
+        .breakdown-title { font-size: 0.75rem; color: #888; display: block; }
+        .breakdown-value { font-size: 1.1rem; color: var(--text); font-weight: bold; margin-top: 5px; display: block; }
+        .interest-color { color: var(--primary) !important; }
+        
+        /* 百万富翁彩蛋特效 */
+        .millionaire-msg { display: none; background: rgba(0, 255, 65, 0.1); color: var(--primary); padding: 15px; border-radius: 10px; margin-top: 15px; font-weight: bold; text-align: center; border: 1px dashed var(--primary); font-family: 'Segoe UI', sans-serif; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.4); } 70% { box-shadow: 0 0 10px 10px rgba(0, 255, 65, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0); } }
+        
+        /* 图表容器 */
+        .chart-container { margin-top: 20px; width: 100%; height: 250px; }
+        .footer { text-align: center; margin-top: 1.5rem; font-size: 0.7rem; color: #555; font-family: 'Segoe UI', sans-serif;}
     </style>
 </head>
 <body>
     <a href="index.html" class="back-link">← 返回大厅 (Back to Lobby)</a>
     
     <div class="container">
-        <h1>Game of Life</h1>
+        <h1>Game of Life | Money Mission</h1>
+        <div class="subtitle">金钱游戏 | 复利+时间 = 奇迹</div>
+
         <div class="input-group">
-            <label>初始本金 (Starting Gold)</label>
+            <label>初始本金 (Starting Capital)</label>
             <input type="number" id="principal" value="0" oninput="calculate()">
         </div>
         <div class="input-group">
@@ -44,28 +67,134 @@
         </div>
 
         <div class="result-box">
-            <div class="result-label">预计总资产为:</div>
+            <div class="result-label">预计总资产为 (Total Worth):</div>
             <div class="result-value" id="totalResult">RM 0.00</div>
+            
+            <div class="breakdown">
+                <div>
+                    <span class="breakdown-title">投入本金 (Capital)</span>
+                    <span class="breakdown-value" id="totalCapital">RM 0.00</span>
+                </div>
+                <div>
+                    <span class="breakdown-title">赚取利息 (Interest)</span>
+                    <span class="breakdown-value interest-color" id="totalInterest">RM 0.00</span>
+                </div>
+            </div>
+            
+            <div id="millionaireGreeting" class="millionaire-msg"></div>
         </div>
-        <p class="footer">复利是你的自动挂机脚本</p>
+
+        <div class="chart-container">
+            <canvas id="growthChart"></canvas>
+        </div>
+
+        <p class="footer">Senyu | 你的自动挂机脚本</p>
     </div>
 
     <script>
+        let myChart; // 用于存放图表实例
+        const currentYear = new Date().getFullYear();
+
         function calculate() {
             const P = parseFloat(document.getElementById('principal').value) || 0;
             const PMT = parseFloat(document.getElementById('monthly').value) || 0;
-            const r = (parseFloat(document.getElementById('rate').value) || 0) / 100 / 12;
-            const n = (parseFloat(document.getElementById('years').value) || 0) * 12;
+            const ratePercent = parseFloat(document.getElementById('rate').value) || 0;
+            const r = ratePercent / 100 / 12;
+            const years = parseInt(document.getElementById('years').value) || 0;
+            const n = years * 12;
 
-            let futureValue = 0;
-            if (r === 0) {
-                futureValue = P + (PMT * n);
-            } else {
-                futureValue = P * Math.pow(1 + r, n) + PMT * (Math.pow(1 + r, n) - 1) / r;
+            // 用于画图表的数据组
+            let labels = [];
+            let capitalData = [];
+            let interestData = [];
+            
+            let accumulatedCapital = P;
+            let finalValue = P;
+
+            // 逐年计算复利数据
+            for (let i = 1; i <= years; i++) {
+                labels.push(currentYear + i); // X轴年份，比如 2027, 2028...
+                accumulatedCapital = P + (PMT * 12 * i);
+                
+                let yearlyValue = 0;
+                if (r === 0) {
+                    yearlyValue = accumulatedCapital;
+                } else {
+                    let months = i * 12;
+                    yearlyValue = P * Math.pow(1 + r, months) + PMT * (Math.pow(1 + r, months) - 1) / r;
+                }
+                
+                capitalData.push(accumulatedCapital);
+                interestData.push(yearlyValue - accumulatedCapital);
+                
+                if(i === years) finalValue = yearlyValue; // 记录最后一年的总数
             }
 
-            document.getElementById('totalResult').innerText = "RM " + futureValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            // 更新文字结果
+            let totalCap = P + (PMT * n);
+            let totalInt = finalValue - totalCap;
+            if(totalInt < 0) totalInt = 0; // 防止负数
+            
+            document.getElementById('totalResult').innerText = "RM " + finalValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('totalCapital').innerText = "RM " + totalCap.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            document.getElementById('totalInterest').innerText = "+RM " + totalInt.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+
+            // 检查百万富翁成就
+            const greetingBox = document.getElementById('millionaireGreeting');
+            if (finalValue >= 1000000) {
+                const targetYear = currentYear + years;
+                greetingBox.style.display = 'block';
+                greetingBox.innerText = `🎉 In ${targetYear}, congrats you are a millionaire!`;
+            } else {
+                greetingBox.style.display = 'none';
+            }
+
+            // 更新图表 (叠加柱状图)
+            updateChart(labels, capitalData, interestData);
         }
+
+        function updateChart(labels, capitalData, interestData) {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            
+            if (myChart) {
+                myChart.destroy(); // 每次计算前清空旧图表
+            }
+            
+            myChart = new Chart(ctx, {
+                type: 'bar', // 使用柱状图
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '本金 (Capital)',
+                            data: capitalData,
+                            backgroundColor: '#333333',
+                            borderWidth: 0
+                        },
+                        {
+                            label: '复利 (Interest)',
+                            data: interestData,
+                            backgroundColor: '#00ff41',
+                            borderWidth: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } },
+                        y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#aaa', font: { family: 'Courier New' } } },
+                        tooltip: { mode: 'index', intersect: false }
+                    }
+                }
+            });
+        }
+
+        // 页面加载时执行一次计算
         calculate();
     </script>
 </body>

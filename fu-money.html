@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armor Builder | F U Money</title>
+    <style>
+        :root { --primary: #00ff41; --bg: #0d0d0d; --card: #1a1a1a; --text: #e0e0e0; --warning: #ff4757; --good: #2ed573; --alert: #ffa502; --border: #333; --kid: #0984e3; }
+        body { background: var(--bg); color: var(--text); font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px 0; }
+        
+        /* 通用样式 */
+        .back-link { color: #888; text-decoration: none; font-size: 0.9rem; margin-bottom: 20px; font-family: 'Segoe UI', sans-serif;}
+        .back-link:hover { color: var(--primary); }
+        .container { background: var(--card); padding: 2rem; border-radius: 15px; border: 2px solid var(--primary); box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); width: 90%; max-width: 500px; position: relative; overflow: hidden;}
+        
+        /* 音乐开关 */
+        .music-toggle { position: absolute; top: 15px; right: 15px; background: #000; border: 1px solid var(--primary); color: var(--primary); font-size: 0.7rem; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-family: 'Segoe UI', sans-serif; transition: all 0.3s; z-index: 10;}
+        .music-active { background: var(--primary); color: #000; box-shadow: 0 0 10px var(--primary); }
+
+        h1 { color: var(--primary); text-align: center; font-size: 1.3rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px; line-height: 1.4; font-weight: 800;}
+        .en-sub { font-size: 0.7em; display: block; color: #888; letter-spacing: 0px; font-weight: normal; margin-top: 5px;}
+        .subtitle { text-align: center; color: #888; font-size: 0.9rem; margin-bottom: 1.5rem; font-family: 'Segoe UI', sans-serif;}
+        
+        /* 输入区域样式 */
+        .category-box { background: #111; border: 1px solid var(--border); border-radius: 10px; padding: 15px; margin-bottom: 15px; transition: all 0.3s ease;}
+        .category-title { color: var(--primary); font-size: 0.9rem; margin-bottom: 12px; font-weight: bold; border-bottom: 1px dashed var(--border); padding-bottom: 5px; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center;}
+        .category-title span { font-size: 0.8em; color: #666; font-weight: normal;}
+        
+        .kid-box { border-color: var(--kid); display: none; background: rgba(9, 132, 227, 0.05);}
+        .kid-box .category-title { color: var(--kid); border-bottom: 1px dashed var(--kid);}
+        .kid-box input:focus { border-color: var(--kid); }
+
+        .input-group { margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222; padding-bottom: 5px;}
+        .input-group:last-child { border-bottom: none; margin-bottom: 0;}
+        
+        /* 双语标签样式 */
+        label { font-size: 0.85rem; color: #ddd; font-family: 'Segoe UI', sans-serif; flex: 1; padding-right: 10px; line-height: 1.3;}
+        .en-label { display: block; font-size: 0.75rem; color: #777; margin-top: 2px;}
+
+        input, select { width: 110px; padding: 8px; background: #000; border: 1px solid var(--border); color: var(--primary); border-radius: 5px; box-sizing: border-box; font-size: 1rem; outline: none; font-family: 'Courier New', monospace; text-align: right;}
+        input:focus, select:focus { border-color: var(--primary); }
+        
+        /* 模式切换 */
+        .mode-switch { text-align: center; margin-bottom: 20px; padding: 15px; background: #000; border: 1px dashed var(--primary); border-radius: 10px; }
+        .mode-title { font-size: 0.9rem; font-weight: bold; color: var(--primary); margin-bottom: 10px; font-family: 'Segoe UI', sans-serif;}
+        .radio-group { display: flex; justify-content: center; gap: 15px; font-family: 'Segoe UI', sans-serif; font-size: 0.85rem;}
+        .radio-group label { display: flex; align-items: center; cursor: pointer; color: var(--text); padding: 5px 10px; border-radius: 5px; background: #222; transition: 0.3s;}
+        .radio-group input { width: auto; margin-right: 5px; cursor: pointer;}
+        .radio-group label:hover { background: #333; }
+
+        .full-width { display: block; width: 100%; margin-top: 20px; border-bottom: none;}
+        .full-width label { display: block; margin-bottom: 10px; font-size: 0.9rem;}
+        .full-width select, .full-width input { width: 100%; text-align: left;}
+
+        /* ★ 打造按钮 (Action Button) ★ */
+        .forge-btn { width: 100%; background: var(--primary); color: #000; font-family: 'Courier New', monospace; font-size: 1.2rem; font-weight: bold; padding: 15px; border: none; border-radius: 8px; cursor: pointer; margin-top: 20px; text-transform: uppercase; box-shadow: 0 0 15px rgba(0, 255, 65, 0.4); transition: transform 0.1s; display: block;}
+        .forge-btn:active { transform: scale(0.98); }
+        .forge-btn:hover { background: #2ed573; }
+
+        /* ★ Loading 界面 ★ */
+        #loadingOverlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; flex-direction: column; justify-content: center; align-items: center; text-align: center; backdrop-filter: blur(5px);}
+        .loader-text { color: var(--primary); font-family: 'Courier New', monospace; margin-bottom: 15px; font-size: 1rem; }
+        .loader-bar-bg { width: 80%; height: 10px; background: #222; border-radius: 5px; overflow: hidden; border: 1px solid #444; }
+        .loader-bar-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.1s linear; box-shadow: 0 0 10px var(--primary);}
+        .loader-percent { color: #fff; margin-top: 10px; font-size: 1.2rem; font-weight: bold; }
+
+        /* ★ 结果展示页 (壁纸模式) ★ */
+        #resultPage { display: none; text-align: center; padding-top: 10px; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .screenshot-card { border: 2px solid var(--primary); padding: 20px; border-radius: 15px; background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); position: relative; margin-bottom: 20px;}
+        .card-header { font-size: 0.8rem; color: #666; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;}
+        .date-stamp { float: right; color: var(--primary); font-weight: bold;}
+        
+        .res-title { font-size: 0.9rem; color: #888; margin-bottom: 5px; font-family: 'Segoe UI', sans-serif;}
+        .res-value { font-size: 2.5rem; color: var(--primary); font-weight: bold; text-shadow: 0 0 20px rgba(0, 255, 65, 0.3); margin-bottom: 20px; line-height: 1;}
+        
+        .burn-badge { display: inline-block; background: #222; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; color: #ff4757; border: 1px solid #ff4757; margin-bottom: 20px;}
+
+        .res-grid { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px;}
+        .res-item { background: #111; padding: 10px; border-radius: 8px; flex: 1; border: 1px solid #333;}
+        .res-item-label { font-size: 0.7rem; color: #888; display: block; margin-bottom: 5px;}
+        .res-item-val { font-size: 1.1rem; color: #fff; font-weight: bold;}
+
+        .system-msg-box { padding: 15px; border-radius: 8px; font-family: 'Segoe UI', sans-serif; font-weight: bold; font-size: 0.9rem; line-height: 1.4; border: 1px dashed; margin-top: 10px;}
+        
+        .watermark { margin-top: 20px; font-size: 0.7rem; color: #444; text-transform: uppercase; letter-spacing: 1px;}
+        
+        .recalc-btn { background: transparent; border: 1px solid #666; color: #888; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; font-family: 'Segoe UI', sans-serif;}
+        .recalc-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+        .footer { text-align: center; margin-top: 1.5rem; font-size: 0.7rem; color: #555; font-family: 'Segoe UI', sans-serif;}
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">← 返回大厅 / Back to Lobby</a>
+    
+    <div class="container">
+        <audio id="bgm" src="bgm.mp3" loop></audio>
+        <div id="musicBtn" class="music-toggle" onclick="toggleMusic()">🔇 BGM: OFF</div>
+
+        <h1>金钱游戏 - 防弹衣 | 你的底气<span class="en-sub">Armor Builder | F U Money</span></h1>
+        
+        <div id="loadingOverlay">
+            <div class="loader-text" id="loaderText">正在分析生活数据...<br>Analyzing Life Data...</div>
+            <div class="loader-bar-bg">
+                <div class="loader-bar-fill" id="loaderFill"></div>
+            </div>
+            <div class="loader-percent" id="loaderPercent">0%</div>
+        </div>
+
+        <div id="inputPage">
+            <div class="subtitle">先算生存，再谈理想<br>Calculate Survival First</div>
+
+            <div class="mode-switch">
+                <div class="mode-title">👶 是否有绑定小玩家？<br><span style="font-size:0.8em; font-weight:normal; color:#888;">Do you have kids?</span></div>
+                <div class="radio-group">
+                    <label><input type="radio" name="hasKids" value="no" checked onchange="toggleKids()"> ❌ 没有 (No)</label>
+                    <label><input type="radio" name="hasKids" value="yes" onchange="toggleKids()"> 🍼 有 (Yes)</label>
+                </div>
+            </div>
+
+            <div class="category-box">
+                <div class="category-title">🏠 庇护所成本 <span>Shelter</span></div>
+                <div class="input-group">
+                    <label>房租或房贷 <span class="en-label">Rental / Mortgage ($)</span></label>
+                    <input type="number" id="v_housing" value="0">
+                </div>
+            </div>
+
+            <div class="category-box">
+                <div class="category-title">🍚 生存能量 <span>Survival</span></div>
+                <div class="input-group">
+                    <label>饮食杂货 <span class="en-label">Food & Groceries ($)</span></label>
+                    <input type="number" id="v_food" value="0">
+                </div>
+                <div class="input-group">
+                    <label>车贷与交通费 <span class="en-label">Car Loan / Transport ($)</span></label>
+                    <input type="number" id="v_transport" value="0">
+                </div>
+                <div class="input-group">
+                    <label>父母家用 <span class="en-label">Parents Allowance ($)</span></label>
+                    <input type="number" id="v_parents" value="0">
+                </div>
+            </div>
+
+            <div class="category-box">
+                <div class="category-title">💳 债务与账单 <span>Debts & Bills</span></div>
+                <div class="input-group">
+                    <label>水电与上网费 <span class="en-label">Utilities / Wi-Fi ($)</span></label>
+                    <input type="number" id="v_utilities" value="0">
+                </div>
+                <div class="input-group">
+                    <label>个人/学贷/卡债 <span class="en-label">Loans & Credit Card ($)</span></label>
+                    <input type="number" id="v_loans" value="0">
+                </div>
+            </div>
+
+            <div class="category-box">
+                <div class="category-title">🛡️ 护甲维持费 <span>Insurance</span></div>
+                <div class="input-group">
+                    <label>医药卡 <span class="en-label">Medical Card ($)</span></label>
+                    <input type="number" id="v_ins_med" value="0">
+                </div>
+                <div class="input-group">
+                    <label>人寿保险 <span class="en-label">Life Insurance ($)</span></label>
+                    <input type="number" id="v_ins_life" value="0">
+                </div>
+                <div class="input-group">
+                    <label>车险 (按月平摊) <span class="en-label">Car Insurance / Month ($)</span></label>
+                    <input type="number" id="v_ins_car" value="0">
+                </div>
+            </div>
+
+            <div id="kids_section" class="category-box kid-box">
+                <div class="category-title">👶 小玩家开销 <span>Kid's Expenses</span></div>
+                <div class="input-group">
+                    <label>奶粉/尿布/日常 <span class="en-label">Milk/Diapers/Daily ($)</span></label>
+                    <input type="number" id="v_kid_cons" value="0">
+                </div>
+                <div class="input-group">
+                    <label>保姆/托儿/学费 <span class="en-label">Nanny/School Fees ($)</span></label>
+                    <input type="number" id="v_kid_school" value="0">
+                </div>
+                <div class="input-group">
+                    <label>补习与兴趣班 <span class="en-label">Tuition/Enrichment ($)</span></label>
+                    <input type="number" id="v_kid_tuition" value="0">
+                </div>
+                <div class="input-group">
+                    <label>孩子保险/医药 <span class="en-label">Kid's Insurance ($)</span></label>
+                    <input type="number" id="v_kid_ins" value="0">
+                </div>
+                <div class="input-group">
+                    <label>零用钱与杂费 <span class="en-label">Allowance & Misc ($)</span></label>
+                    <input type="number" id="v_kid_misc" value="0">
+                </div>
+                <div class="input-group">
+                    <label>教育基金储蓄 <span class="en-label">Education Fund ($)</span></label>
+                    <input type="number" id="v_kid_fund" value="0">
+                </div>
+            </div>
+
+            <div class="category-box">
+                <div class="category-title">🎉 精神回血 <span>Mental HP</span></div>
+                <div class="input-group">
+                    <label>线上订阅 <span class="en-label">Subs (Netflix/YT) ($)</span></label>
+                    <input type="number" id="v_subs" value="0">
+                </div>
+                <div class="input-group">
+                    <label>娱乐与庆祝 <span class="en-label">Entertainment ($)</span></label>
+                    <input type="number" id="v_leisure" value="0">
+                </div>
+            </div>
+
+            <div class="input-group full-width">
+                <label>🛡️ 防御等级 (你需要几个月的底气？)<br><span class="en-label">Defense Level (Months Needed)</span></label>
+                <select id="v_months">
+                    <option value="3">3 个月 (新手纸甲 / Paper Armor)</option>
+                    <option value="6" selected>6 个月 (标准铁甲 / Iron Armor)</option>
+                    <option value="9">9 个月 (高级钢甲 / Steel Armor)</option>
+                    <option value="12">12 个月 (神级防弹衣 / God Tier)</option>
+                </select>
+            </div>
+
+            <div class="input-group full-width">
+                <label>💰 每月打铁 (你现在每月能存多少？)<br><span class="en-label">Current Monthly Saving ($)</span></label>
+                <input type="number" id="v_saving" value="0" style="color: var(--primary);">
+            </div>
+
+            <button class="forge-btn" onclick="startProcess()">⚡ 开始打造 / Forge Armor</button>
+        </div>
+
+        <div id="resultPage">
+            <div class="screenshot-card">
+                <div class="card-header">
+                    ARMOR STATS <span class="date-stamp" id="currentDate">2026-02-18</span>
+                </div>
+                
+                <div class="res-title">你的自由底气总额 (Target Amount)</div>
+                <div class="res-value" id="res_target">$ 0</div>
+                
+                <div class="burn-badge" id="res_burn">Monthly Burn: $ 0</div>
+                
+                <div class="res-grid">
+                    <div class="res-item">
+                        <span class="res-item-label">预计打造时间<br>Time to Build</span>
+                        <span class="res-item-val" id="res_time">0 Mths</span>
+                    </div>
+                    <div class="res-item">
+                        <span class="res-item-label">防御等级<br>Defense Level</span>
+                        <span class="res-item-val" id="res_level">6 Mths</span>
+                    </div>
+                </div>
+
+                <div id="sys_msg" class="system-msg-box"></div>
+                
+                <div class="watermark">Senyu | The Life Player 9169</div>
+            </div>
+            
+            <p style="color:#666; font-size:0.75rem;">截图保存作为手机壁纸，时刻提醒自己<br>Screenshot as wallpaper for motivation</p>
+            <button class="recalc-btn" onclick="resetPage()">↺ 重新计算 / Recalculate</button>
+        </div>
+
+        <p class="footer">Senyu | The Life Player 9169</p>
+    </div>
+
+    <script>
+        // --- 音乐控制系统 ---
+        let musicPlaying = false;
+        function toggleMusic() {
+            const audio = document.getElementById('bgm');
+            const btn = document.getElementById('musicBtn');
+            if (musicPlaying) {
+                audio.pause();
+                musicPlaying = false;
+                btn.innerHTML = "🔇 BGM: OFF";
+                btn.classList.remove("music-active");
+            } else {
+                audio.volume = 0.2; // 默认音量 20%
+                audio.play().then(() => {
+                    musicPlaying = true;
+                    btn.innerHTML = "🎵 BGM: ON";
+                    btn.classList.add("music-active");
+                }).catch(e => console.log("Click required"));
+            }
+        }
+        document.body.addEventListener('click', function() { if (!musicPlaying) toggleMusic(); }, { once: true });
+
+        // --- 核心逻辑 ---
+        function toggleKids() {
+            const hasKids = document.querySelector('input[name="hasKids"]:checked').value;
+            document.getElementById('kids_section').style.display = (hasKids === 'yes') ? 'block' : 'none';
+        }
+
+        // 开始计算流程 (动画)
+        function startProcess() {
+            // 1. 隐藏输入，显示Loading
+            document.getElementById('inputPage').style.display = 'none';
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            
+            // 2. 进度条动画
+            let progress = 0;
+            const duration = Math.floor(Math.random() * 2000) + 2000; // 2000-4000ms 随机
+            const intervalTime = 50;
+            const steps = duration / intervalTime;
+            const increment = 100 / steps;
+            
+            const loaderFill = document.getElementById('loaderFill');
+            const loaderPercent = document.getElementById('loaderPercent');
+            const loaderText = document.getElementById('loaderText');
+            
+            const messages = [
+                "正在分析生活开销...<br>Analyzing Expenses...",
+                "正在计算生存燃尽率...<br>Calculating Burn Rate...",
+                "正在生成防弹衣蓝图...<br>Generating Blueprint...",
+                "即将完成...<br>Finalizing..."
+            ];
+
+            let timer = setInterval(() => {
+                progress += increment;
+                if (progress >= 100) progress = 100;
+                
+                loaderFill.style.width = progress + "%";
+                loaderPercent.innerText = Math.floor(progress) + "%";
+                
+                // 随机切换文字
+                if (progress < 90 && Math.random() > 0.8) {
+                    const msgIndex = Math.floor(Math.random() * messages.length);
+                    loaderText.innerHTML = messages[msgIndex];
+                }
+
+                if (progress >= 100) {
+                    clearInterval(timer);
+                    setTimeout(showResult, 500); // 停顿一下再显示结果
+                }
+            }, intervalTime);
+        }
+
+        // 显示结果
+        function showResult() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+            document.getElementById('resultPage').style.display = 'block';
+            calculateData(); // 执行计算
+        }
+
+        function resetPage() {
+            document.getElementById('resultPage').style.display = 'none';
+            document.getElementById('inputPage').style.display = 'block';
+        }
+
+        function calculateData() {
+            try {
+                // 获取所有数值
+                const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
+                
+                const housing = getVal('v_housing');
+                const food = getVal('v_food');
+                const transport = getVal('v_transport');
+                const parents = getVal('v_parents');
+                const utilities = getVal('v_utilities');
+                const loans = getVal('v_loans');
+                const insMed = getVal('v_ins_med');
+                const insLife = getVal('v_ins_life');
+                const insCar = getVal('v_ins_car');
+                const subs = getVal('v_subs');
+                const leisure = getVal('v_leisure');
+                
+                // 孩子开销
+                let kidExpenses = 0;
+                if (document.querySelector('input[name="hasKids"]:checked').value === 'yes') {
+                    kidExpenses = getVal('v_kid_cons') + getVal('v_kid_school') + getVal('v_kid_tuition') + getVal('v_kid_ins') + getVal('v_kid_misc') + getVal('v_kid_fund');
+                }
+                
+                const months = parseInt(document.getElementById('v_months').value);
+                const saving = getVal('v_saving');
+
+                // 计算
+                const monthlyBurn = housing + food + transport + parents + utilities + loans + insMed + insLife + insCar + subs + leisure + kidExpenses;
+                const targetAmount = monthlyBurn * months;
+                
+                // 更新 UI
+                
+                // 1. 日期
+                const today = new Date();
+                document.getElementById('currentDate').innerText = today.toLocaleDateString('en-GB').split('/').reverse().join('-');
+
+                // 2. 数值 (使用 $ 符号)
+                document.getElementById('res_target').innerText = "$ " + targetAmount.toLocaleString();
+                document.getElementById('res_burn').innerText = "Monthly Burn: $ " + monthlyBurn.toLocaleString();
+                document.getElementById('res_level').innerText = months + " Mths";
+
+                // 3. 时间与评级
+                const msgBox = document.getElementById('sys_msg');
+                
+                if (saving <= 0) {
+                    document.getElementById('res_time').innerText = "∞";
+                    msgBox.innerHTML = "<span style='color:var(--warning)'>⚠️ DANGER (危险)</span><br>你正在裸奔！没有存款，随时会被生活击倒！<br>You have 0 savings!";
+                    msgBox.style.borderColor = "var(--warning)";
+                    msgBox.style.color = "var(--warning)";
+                } else {
+                    const monthsNeeded = Math.ceil(targetAmount / saving);
+                    
+                    let timeText = "";
+                    if (monthsNeeded >= 12) {
+                        const y = (monthsNeeded / 12).toFixed(1);
+                        timeText = `${y} Years`;
+                    } else {
+                        timeText = `${monthsNeeded} Mths`;
+                    }
+                    document.getElementById('res_time').innerText = timeText;
+
+                    if (monthsNeeded > 36) {
+                        msgBox.innerHTML = "<span style='color:var(--alert)'>⚠️ TOO SLOW (太慢)</span><br>需超过3年才能完成。建议提升收入！<br>Need >3 years. Increase income!";
+                        msgBox.style.borderColor = "var(--alert)";
+                        msgBox.style.color = "var(--alert)";
+                    } else if (monthsNeeded <= 12) {
+                        msgBox.innerHTML = "<span style='color:var(--good)'>🌟 LEGENDARY (传说级)</span><br>1年内防弹衣成型！准备起飞！<br>Ready in 1 year! Let's go!";
+                        msgBox.style.borderColor = "var(--good)";
+                        msgBox.style.color = "var(--good)";
+                    } else {
+                        msgBox.innerHTML = "<span style='color:var(--primary)'>🛡️ ON TRACK (稳步中)</span><br>保持纪律，自由就在前方！<br>Keep grinding, freedom is near.";
+                        msgBox.style.borderColor = "var(--primary)";
+                        msgBox.style.color = "var(--primary)";
+                    }
+                }
+
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        
+        // Init
+        toggleKids();
+    </script>
+</body>
+</html>
