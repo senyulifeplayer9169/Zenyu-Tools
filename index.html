@@ -8,26 +8,25 @@
         :root { --primary: #00ff41; --bg: #0d0d0d; --card: #1a1a1a; --text: #e0e0e0; --lock: #555; }
         body { background: var(--bg); color: var(--text); font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
         
-        /* 音乐开关 (大厅版) */
         .music-toggle { position: absolute; top: 15px; right: 15px; background: #000; border: 1px solid var(--primary); color: var(--primary); font-size: 0.7rem; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-family: 'Segoe UI', sans-serif; transition: all 0.3s; z-index: 10;}
         .music-active { background: var(--primary); color: #000; box-shadow: 0 0 10px var(--primary); }
 
-        /* 头部档案卡 (无Logo版) */
         .profile-section { text-align: center; margin-bottom: 40px; border-bottom: 1px solid #333; padding-bottom: 20px; width: 100%; max-width: 600px; margin-top: 40px;}
-        h1 { margin: 0; color: var(--primary); text-transform: uppercase; letter-spacing: 3px; font-size: 1.8rem; text-shadow: 0 0 10px rgba(0, 255, 65, 0.5); font-weight: 800;}
-        .bio { font-size: 0.8rem; color: #888; margin-top: 8px; font-family: 'Segoe UI', sans-serif; letter-spacing: 1px;}
+        h1 { margin: 0; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; font-size: 1.8rem; text-shadow: 0 0 10px rgba(0, 255, 65, 0.5); font-weight: 800;}
+        .bio { font-size: 0.8rem; color: #888; margin-top: 8px; font-family: 'Segoe UI', sans-serif;}
 
-        /* 工具网格 */
         .tools-grid { display: grid; grid-template-columns: 1fr; gap: 20px; width: 100%; max-width: 500px; }
         
-        /* 卡片样式 */
         .tool-card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 12px; text-decoration: none; color: var(--text); display: flex; align-items: center; justify-content: space-between; transition: all 0.3s ease; position: relative; overflow: hidden;}
-        
-        /* 在线状态 (可点击) */
         .tool-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .tool-card:hover .icon { text-shadow: 0 0 10px var(--primary); }
         
-        /* 锁定状态 */
+        /* 针对 Ryt Bank 的特殊高亮样式 */
+        .promo-card { border-color: #ff3366; }
+        .promo-card:hover { border-color: #ff3366; box-shadow: 0 5px 15px rgba(255, 51, 102, 0.4); }
+        .promo-card .status.online { background: rgba(255, 51, 102, 0.1); color: #ff3366; border-color: #ff3366; box-shadow: 0 0 5px #ff3366;}
+        .promo-code { display: inline-block; background: #333; color: #fff; padding: 2px 6px; border-radius: 4px; font-family: monospace; letter-spacing: 1px; font-size: 0.75rem; margin-top: 5px; border: 1px dashed #ff3366;}
+
         .locked { opacity: 0.5; cursor: not-allowed; border-style: dashed; filter: grayscale(100%); }
         .locked:hover { transform: none; border-color: #333; box-shadow: none;}
         
@@ -37,17 +36,13 @@
         .info p { margin: 3px 0 0; font-size: 0.7rem; color: #888; }
         .en-sub { font-size: 0.75em; color: #666; font-weight: normal; display: block;}
 
-        /* 状态标签 */
         .status { font-size: 0.6rem; padding: 4px 8px; border-radius: 4px; font-weight: bold; letter-spacing: 1px;}
         .status.online { background: rgba(0, 255, 65, 0.1); color: var(--primary); border: 1px solid var(--primary); box-shadow: 0 0 5px var(--primary);}
         .status.soon { background: #222; color: #666; border: 1px solid #444; }
 
         .footer { margin-top: 50px; font-size: 0.7rem; color: #444; text-align: center; }
         
-        /* 适配电脑屏幕 */
-        @media (min-width: 600px) {
-            .tools-grid { grid-template-columns: 1fr 1fr; max-width: 800px; }
-        }
+        @media (min-width: 600px) { .tools-grid { grid-template-columns: 1fr 1fr; max-width: 800px; } }
     </style>
 </head>
 <body>
@@ -73,12 +68,24 @@
             <div class="status online">ONLINE</div>
         </a>
 
+        <a href="ryt-promo.html" class="tool-card promo-card">
+            <div class="card-left">
+                <div class="icon">🧧</div>
+                <div class="info">
+                    <h3>新手福利包 - Ryt Bank<span class="en-sub">Initial Coin | Free Loot Box</span></h3>
+                    <p>存防弹衣，领最高 RM88</p>
+                    <span class="promo-code">Code: 6AWVK</span>
+                </div>
+            </div>
+            <div class="status online">EVENT</div>
+        </a>
+
         <div class="tool-card locked">
             <div class="card-left">
                 <div class="icon">📈</div>
                 <div class="info">
                     <h3>金钱游戏 - 复利<span class="en-sub">Money Mission | Compound</span></h3>
-                    <p>Day 3 解锁 / Coming Soon...</p>
+                    <p>Day 4 解锁 / Coming Soon...</p>
                 </div>
             </div>
             <div class="status soon">LOCKED</div>
@@ -110,30 +117,24 @@
 
     <div class="footer">
         &copy; 2026 Zenyu Resources. All Rights Reserved.<br>
-        System Version 1.4
+        System Version 1.5
     </div>
 
     <script>
-        // --- 大厅音乐控制系统 ---
         let musicPlaying = false;
         function toggleMusic() {
             const audio = document.getElementById('lobbyBgm');
             const btn = document.getElementById('musicBtn');
             if (musicPlaying) {
-                audio.pause();
-                musicPlaying = false;
-                btn.innerHTML = "🔇 BGM: OFF";
-                btn.classList.remove("music-active");
+                audio.pause(); musicPlaying = false;
+                btn.innerHTML = "🔇 BGM: OFF"; btn.classList.remove("music-active");
             } else {
-                audio.volume = 0.2; // 默认音量 20%
+                audio.volume = 0.2; 
                 audio.play().then(() => {
-                    musicPlaying = true;
-                    btn.innerHTML = "🎵 BGM: ON";
-                    btn.classList.add("music-active");
+                    musicPlaying = true; btn.innerHTML = "🎵 BGM: ON"; btn.classList.add("music-active");
                 }).catch(e => console.log("Click required"));
             }
         }
-        // 第一次点击页面自动播放
         document.body.addEventListener('click', function() { if (!musicPlaying) toggleMusic(); }, { once: true });
     </script>
 </body>

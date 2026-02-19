@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenyu | Ryt Bank Loot Box</title>
+    <style>
+        :root { --primary: #00ff41; --bg: #0d0d0d; --card: #1a1a1a; --text: #e0e0e0; --accent: #ff3366; --subtext: #888; }
+        body { background: var(--bg); color: var(--text); font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; position: relative;}
+        
+        /* 专属福利房音乐开关 (红黑色调) */
+        .music-toggle { position: absolute; top: 15px; right: 15px; background: #000; border: 1px solid var(--accent); color: var(--accent); font-size: 0.7rem; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-family: 'Segoe UI', sans-serif; transition: all 0.3s; z-index: 10; box-shadow: 0 0 5px rgba(255, 51, 102, 0.3);}
+        .music-active { background: var(--accent); color: #fff; box-shadow: 0 0 15px var(--accent); }
+
+        .container { background: var(--card); border: 1px solid #333; border-radius: 12px; padding: 25px; max-width: 450px; width: 100%; text-align: center; margin-top: 40px; box-shadow: 0 5px 20px rgba(0,0,0,0.5);}
+        
+        /* 图片自适应 */
+        .promo-img { width: 100%; border-radius: 8px; border: 1px solid #333; margin-bottom: 20px; box-shadow: 0 0 15px rgba(255, 51, 102, 0.2);}
+        
+        /* 文案排版 */
+        .text-content { text-align: left; font-family: 'Segoe UI', sans-serif; font-size: 0.95rem; line-height: 1.6; color: var(--text); }
+        .en-sub { font-size: 0.85rem; color: var(--subtext); display: block; margin-bottom: 15px; font-style: italic;}
+        
+        /* 系统 Buff 框 (3个重点) */
+        .buff-box { background: #111; border: 1px solid var(--primary); border-radius: 8px; padding: 15px; margin: 20px 0; box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);}
+        .buff-title { color: var(--primary); font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: bold; margin-bottom: 12px; text-transform: uppercase; border-bottom: 1px dashed #333; padding-bottom: 5px;}
+        .buff-item { margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px;}
+        .buff-icon { color: var(--primary); font-weight: bold; font-size: 1.1rem;}
+        .buff-text { font-size: 0.95rem; font-weight: bold; color: #fff;}
+        .buff-sub { font-size: 0.75rem; color: var(--subtext); font-weight: normal; display: block;}
+
+        .link-text { color: var(--primary); text-decoration: none; word-break: break-all; font-weight: bold;}
+        .link-text:hover { text-decoration: underline; text-shadow: 0 0 5px var(--primary);}
+        
+        /* 邀请码高亮框 */
+        .code-box { background: #000; color: var(--accent); font-family: 'Courier New', monospace; font-size: 2.2rem; padding: 12px; border: 1px dashed var(--accent); text-align: center; margin: 5px 0 20px 0; border-radius: 6px; letter-spacing: 4px; font-weight: bold; box-shadow: 0 0 15px rgba(255, 51, 102, 0.3);}
+        
+        .footer-text { font-size: 0.9rem; text-align: center; margin-top: 25px;}
+        .tc-text { font-size: 0.7rem; color: #555; text-align: center; margin-top: 15px;}
+
+        .back-btn { display: inline-block; margin-top: 30px; color: #888; text-decoration: none; border: 1px solid #444; padding: 8px 15px; border-radius: 5px; font-size: 0.8rem; transition: all 0.3s; font-family: 'Courier New', Courier, monospace;}
+        .back-btn:hover { color: var(--text); border-color: var(--text); background: #333; }
+    </style>
+</head>
+<body>
+
+    <audio id="promoBgm" src="promo-bgm.mp3" loop></audio>
+    <div id="musicBtn" class="music-toggle" onclick="toggleMusic()">🔇 BGM: OFF</div>
+
+    <div class="container">
+        <img src="ryt-promo.jpg" alt="Ryt Bank Angpow" class="promo-img">
+        
+        <div class="text-content">
+            <p style="margin-bottom: 2px;"><strong>🧧 恭喜发财！我给你准备了一个红包！🤩</strong></p>
+            <span class="en-sub">Gong Xi Gong Xi! I've got an angpow for you! 🤩</span>
+            
+            <p style="margin-bottom: 2px;">现在注册 Ryt Bank 并使用我的专属链接，即可获得最高 <strong>RM 88</strong> 的新手福利！</p>
+            <span class="en-sub">Sign up now and get up to RM 88 when you join Ryt Bank with my link:</span>
+            
+            <div class="buff-box">
+                <div class="buff-title">System Buffs / 系统增益</div>
+                <div class="buff-item">
+                    <span class="buff-icon">✅</span>
+                    <div>
+                        <span class="buff-text">年利率 4.0%*</span>
+                        <span class="buff-sub">Interest 4.0% p.a*</span>
+                    </div>
+                </div>
+                <div class="buff-item">
+                    <span class="buff-icon">✅</span>
+                    <div>
+                        <span class="buff-text">利息每日派发</span>
+                        <span class="buff-sub">Interest paid daily</span>
+                    </div>
+                </div>
+                <div class="buff-item">
+                    <span class="buff-icon">✅</span>
+                    <div>
+                        <span class="buff-text">无锁定期 (随时存取)</span>
+                        <span class="buff-sub">No lock-in period</span>
+                    </div>
+                </div>
+            </div>
+            
+            <p style="margin-bottom: 2px;">✔️ <strong>下载 (Download):</strong></p>
+            <p style="margin-top: 0;"><a href="https://referrals.rytbank.my/MCoA/pkdeqob4" target="_blank" class="link-text">https://referrals.rytbank.my/MCoA/pkdeqob4</a></p>
+            
+            <p style="margin-bottom: 2px;">✔️ <strong>使用邀请码 (Use Code):</strong></p>
+            <div class="code-box">6AWVK</div>
+            
+            <div class="footer-text">
+                <p style="margin-bottom: 2px;">🐴 祝你马年行大运！🧧</p>
+                <span class="en-sub" style="margin-bottom: 0;">May the Year of the Horse bring you the Ryt fortune!</span>
+            </div>
+            
+            <div class="tc-text">附带条款 / T&Cs apply.</div>
+        </div>
+
+        <a href="index.html" class="back-btn">⬅ 返回大厅 (Back to Lobby)</a>
+    </div>
+
+    <script>
+        let musicPlaying = false;
+        function toggleMusic() {
+            const audio = document.getElementById('promoBgm');
+            const btn = document.getElementById('musicBtn');
+            if (musicPlaying) {
+                audio.pause(); 
+                musicPlaying = false;
+                btn.innerHTML = "🔇 BGM: OFF"; 
+                btn.classList.remove("music-active");
+            } else {
+                audio.volume = 0.3; // 默认音量 30%
+                audio.play().then(() => {
+                    musicPlaying = true; 
+                    btn.innerHTML = "🎵 BGM: ON"; 
+                    btn.classList.add("music-active");
+                }).catch(e => console.log("Click required to play audio"));
+            }
+        }
+        // 用户第一次点击页面任意位置时自动尝试播放
+        document.body.addEventListener('click', function() { 
+            if (!musicPlaying) toggleMusic(); 
+        }, { once: true });
+    </script>
+</body>
+</html>
