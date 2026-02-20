@@ -7,8 +7,13 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #00ff41; --bg: #0d0d0d; --card: #1a1a1a; --text: #e0e0e0; --accent: #00ccff; --interest: #ffbb00; }
-        body { background: var(--bg); color: var(--text); font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; overflow-x: hidden;}
+        /* 加上了 position: relative 让右上角按钮能固定 */
+        body { background: var(--bg); color: var(--text); font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; overflow-x: hidden; position: relative;}
         
+        /* 专属计算器音乐开关 (赛博蓝) */
+        .music-toggle { position: absolute; top: 15px; right: 15px; background: #000; border: 1px solid var(--accent); color: var(--accent); font-size: 0.7rem; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-family: 'Segoe UI', sans-serif; transition: all 0.3s; z-index: 10; box-shadow: 0 0 5px rgba(0, 204, 255, 0.3);}
+        .music-active { background: var(--accent); color: #000; box-shadow: 0 0 15px var(--accent); font-weight: bold;}
+
         .header { text-align: center; margin-bottom: 20px; margin-top: 30px;}
         h1 { margin: 0; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; font-size: 1.8rem; text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);}
         .sub-title { font-size: 0.8rem; color: #888; font-family: 'Segoe UI', sans-serif;}
@@ -58,6 +63,9 @@
     </style>
 </head>
 <body>
+
+    <audio id="calcBgm" src="calc-bgm.mp3" loop></audio>
+    <div id="musicBtn" class="music-toggle" onclick="toggleMusic()">🔇 BGM: OFF</div>
 
     <div class="header">
         <h1 style="font-size: 1.5rem;">COMPOUND INTEREST CALCULATOR</h1>
@@ -142,6 +150,33 @@
     <a href="index.html" class="back-btn">⬅ 返回大厅 (Back to Lobby)</a>
 
     <script>
+        // --- 音乐播放器逻辑 ---
+        let musicPlaying = false;
+        function toggleMusic() {
+            const audio = document.getElementById('calcBgm');
+            const btn = document.getElementById('musicBtn');
+            if (musicPlaying) {
+                audio.pause(); 
+                musicPlaying = false;
+                btn.innerHTML = "🔇 BGM: OFF"; 
+                btn.classList.remove("music-active");
+            } else {
+                audio.volume = 0.3; // 音量锁定在 30%
+                audio.play().then(() => {
+                    musicPlaying = true; 
+                    btn.innerHTML = "🎵 BGM: ON"; 
+                    btn.classList.add("music-active");
+                }).catch(e => console.log("Click required to play audio"));
+            }
+        }
+        
+        // 监听用户第一次点击，自动触发播放 (突破浏览器限制)
+        document.body.addEventListener('click', function() { 
+            if (!musicPlaying) toggleMusic(); 
+        }, { once: true });
+
+
+        // --- 计算器与图表逻辑 ---
         const formatMoney = (num) => '$' + num.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
         let chartInstance = null;
 
